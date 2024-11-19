@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgre
+  namespace: postgre-app
+  labels:
+    app: postgre
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgre
+  template:
+    metadata:
+      labels:
+        app: postgre
+    spec:
+      containers:
+        - name: postgre
+          image: postgres:13
+          ports:
+            - containerPort: 5432
+          env:
+            - name: PGDB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: configmap-db
+                  key: PGDB_USER
+            - name: PGDB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: configmap-db
+                  key: PGDB_NAME
+            - name: PGDB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secret-db
+                  key: PGDB_PASSWORD
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secret-db
+                  key: POSTGRES_PASSWORD
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgre
+  namespace: postgre-app
+  labels:
+    app: postgre
+spec:
+  selector:
+    app: postgre
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+#  type: LoadBalancer

@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask
+  namespace: flask-app
+  labels:
+    app: flask
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flask
+  template:
+    metadata:
+      labels:
+        app: flask
+    spec:
+      containers:
+        - name: flask
+          image: abhishekcha/flask_app:latest
+          ports:
+            - containerPort: 5000
+          env:
+            - name: PGDB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: flask-app
+                  key: PGDB_HOST
+            - name: PGDB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: flask-app
+                  key: PGDB_USER
+            - name: PGDB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: flask-app
+                  key: PGDB_NAME
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: flask-app
+                  key: REDIS_HOST
+            - name: PGDB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secret-app
+                  key: PGDB_PASSWORD
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secret-app
+                  key: POSTGRES_PASSWORD
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask
+  namespace: flask-app
+  labels:
+    app: flask
+spec:
+  selector:
+    app: flask
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+  type: LoadBalancer

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-db
+  namespace: postgre-app  # Set the namespace here
+  labels:
+    app: postgre
+data:
+  PGDB_NAME: postgres
+  PGDB_USER: postgres

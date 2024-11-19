@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flask-app
+  namespace: flask-app  # Set the namespace here
+data:
+  PGDB_HOST: "postgre.postgre-app.svc.cluster.local"
+  PGDB_USER: postgres
+  PGDB_NAME: postgres
+  REDIS_HOST: "redis.redis-app.svc.cluster.local"
